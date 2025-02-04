@@ -30,58 +30,52 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // $exceptions->respond(function (Response $response) {
-        //     if ($response->getStatusCode() === 404) {
-        //         return back()->with([
-        //             'message' => 'The page expired, please try again.',
-        //         ]);
-        //     }
+        $exceptions->respond(function (Response $response, $exceptions) {
+            if ($response->getStatusCode() === 404) {
+                return response()->json([
+                    'message' => 'Record not found.',
+                ], 404);
+            }
+            if ($response->getStatusCode() === 422) {
+                return response()->json([
+                    'message' => 'Validation Failed',
+                ], 422);
+            }
 
-        //     return $response;
-        // });
-        // $exceptions->render(function (NotFoundHttpException $e, Request $request) {
-        //     // if ($request->is('api/*')) {
-        //     //     return response()->json([
-        //     //         'message' => 'Record not found.'
-        //     //     ], 404);
-        //     // }
+            if ($response->getStatusCode() === 401) {
+                return response()->json([
+                    'message' => 'Unauthorized access. Please log in.',
+                ], 401);
+            }
 
-        // });
+            // if ($response->getStatusCode() === 500) {
+            //     return response()->json([
+            //         'message' => 'An unexpected error occurred. Please try again later.',
+            //     ], 500);
+            // }
 
-        // Handle Missing Model Data
-        // $exceptions->render(function (ModelNotFoundException $e, Request $request) {
-        //     // if ($request->is('api/*')) {
-        //     return response()->json([
-        //         'message' => 'Requested resource not found.'
-        //     ], 404);
-        //     // }
-        // });
+            // return $response;
+        });
 
-        // Handle Authentication Errors
-        // $exceptions->render(function (AuthenticationException $e, Request $request) {
-        //     if ($request->is('api/*')) {
-        //         return response()->json([
-        //             'message' => 'Unauthorized access. Please log in.'
-        //         ], 401);
-        //     }
-        // });
+
+
 
         // Handle Validation Errors
         // $exceptions->render(function (ValidationException $e, Request $request) {
         //     if ($request->is('api/*')) {
-        //     return response()->json([
-        //         'message' => 'Validation failed',
-        //         'errors' => $e->errors()
-        //     ], 422);
+        //         return response()->json([
+        //             'message' => 'Validation failed',
+        //             'errors' => $e->errors()
+        //         ], 422);
         //     }
         // });
 
         // Handle Generic Server Errors (Unexpected Errors)
-        $exceptions->render(function (Throwable $e, Request $request) {
-            if ($request->is('api/*')) {
-                return response()->json([
-                    'message' => 'An unexpected error occurred. Please try again later.'
-                ], 500);
-            }
-        });
+        // $exceptions->render(function (Throwable $e, Request $request) {
+        //     if ($request->is('api/*')) {
+        //         return response()->json([
+        //             'message' => 'An unexpected error occurred. Please try again later.'
+        //         ], 500);
+        //     }
+        // });
     })->create();

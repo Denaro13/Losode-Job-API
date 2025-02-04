@@ -161,6 +161,14 @@ class JobController extends Controller
 
         $path = $request->file('cv')->store('cvs', 'public');
 
+        $job = Job::find($id);
+
+        if (!$job) {
+            return response()->json([
+                'message' => 'No job found',
+            ], 404);
+        }
+
         $application = Application::create(
             [
                 "first_name" => $request->first_name,
@@ -179,6 +187,18 @@ class JobController extends Controller
         ], 200);
     }
 
+    public function getUserJobs(Request $request)
+    {
+        $user = Auth::user();
+        // $jobs = Job::where('user_id', $user->id)->paginate(10);
+        $jobs = $user->jobs;
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $jobs
+        ], 200);
+    }
+
     public function handleJobs(Request $request)
     {
         if ($request->has('q')) {
@@ -189,6 +209,6 @@ class JobController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->index($request);
+        return $this->getUserJobs($request);
     }
 }
